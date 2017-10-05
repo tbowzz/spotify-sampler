@@ -129,8 +129,8 @@
         {
           var data = getURLParameter('access_token');
           apiKey = data;
-          console.log(data);
-          alert(data);
+          // console.log(data);
+          // alert(data);
           // updateOAuth(data);
           // apiKey = data.access_token;
           // document.getElementById("api-key").innerHTML  = data.access_token;
@@ -259,6 +259,7 @@
             });
 
             alert(access_token);
+            apiKey = access_token;
 
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
@@ -269,7 +270,7 @@
                   userProfilePlaceholder.innerHTML = userProfileTemplate(response);
 
                   $('#login').hide();
-                  $('#loggedin').show();
+                  $('#loggedin').hide();
 
                   $('#typeField').show();
                   $('#artistField').show();
