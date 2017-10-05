@@ -114,10 +114,31 @@
   <!-- Custom Scripts -->
   <script>
       
+      var apiKey = "BQBCGU4XPQDFJuix0_U8nC5LiDAcvfE157BxrLtiEzWUjiA5V80UgvjVes0g9X2bog_s-1j_aGKoHu-p1mlGafjzLHX9HBclkSv3U0dD_-0AsAHLe1A585uxbFK6DDkho4YUFdSLrw5XhbGT";
+
         function submit(){
           var typedString = $("#artistField").val();
           var searchType = $("#typeField").val();
+          updateAPIKey();
           pullSearchInfo(typedString, searchType);
+        }
+
+        function getURLParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1);
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        function updateAPIKey()
+        {
+          var data = getURLParams();
+          alert(data.access_token);
+          apiKey = data.access_token;
+          // document.getElementById("api-key").innerHTML  = data.access_token;
         }
         
         function pullSearchInfo(str, sType)
@@ -133,8 +154,6 @@
               artistName += "+";
             }
           }
-    
-	var apiKey = "BQBCGU4XPQDFJuix0_U8nC5LiDAcvfE157BxrLtiEzWUjiA5V80UgvjVes0g9X2bog_s-1j_aGKoHu-p1mlGafjzLHX9HBclkSv3U0dD_-0AsAHLe1A585uxbFK6DDkho4YUFdSLrw5XhbGT";
   
           var myurl="https://api.spotify.com";
           myurl += '/v1/search?q=';
@@ -272,8 +291,7 @@
             }).done(function(data) {
               access_token = data.access_token;
               apiKey = data.access_token;
-		document.getElementById("api-key").innerHTML  = data.access_token;
-        	alert(data.access_token);
+		
               oauthPlaceholder.innerHTML = oauthTemplate({
                 access_token: access_token,
                 refresh_token: refresh_token
