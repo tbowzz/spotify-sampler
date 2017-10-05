@@ -1,0 +1,306 @@
+<!doctype html>
+<html>
+  <head>
+
+      <meta charset="utf-8">
+      <title>Spotify Sampler</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <link href="css/bootstrap-responsive.css" rel="stylesheet">
+      <link href="css/style.css" rel="stylesheet">
+      <link href="color/default.css" rel="stylesheet">
+      <link rel="shortcut icon" href="img/favicon.ico">
+      <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      
+
+    <title>Spotify Sampler</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <style type="text/css">
+      #login, #loggedin {
+        display: none;
+      }
+      .text-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 500px;
+      }
+    </style>
+  </head>
+
+  <body style="background-color:black;">
+
+    <!-- navbar -->
+    <div class="navbar-wrapper">
+        <div class="navbar navbar-inverse navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <!-- Responsive navbar -->
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+              </a>
+              <h1 class="brand"><a href="index.html">Spotify Sampler</a></h1>
+              <!-- navigation -->
+              <nav class="pull-right nav-collapse collapse">
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header area -->
+<div id="header-wrapper" class="header-slider">
+    <header class="clearfix">
+      <div class="logo">
+      </div>
+      <div class="container">
+        <div class="row">
+
+          <!-- Login Content -->
+
+          <div class="container">
+              <div id="login">
+                <!-- <h1>This is an example of the Authorization Code flow</h1> -->
+                <a href="/login" class="btn btn-primary" style="width:300px;">Log in with Spotify</a>
+              </div>
+              <div id="loggedin">
+                <div id="user-profile">
+                </div>
+                <div id="oauth">
+                </div>
+                <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+              </div>
+            </div>
+
+
+          <!-- Page Content -->
+          <h3 id="how-to" style="color:white;">
+            Enter any artist, album, or track name below. Then specify the search type and click submit. You will then be able to sample music from 
+            Spotify matching the search results.
+          </h3>
+	<button id="obtain-new-token" type="submit">Click</button>
+	<p id="api-key"></p>          
+          <div class="row"></div>
+  
+          <div class="field artist-name form-group">
+            <input type="text" id="artistField" class="form-control" placeholder="Artist, Track, or Album Name" data-rule="minlen:3" data-msg="Please enter at least 3 chars" style="width:400px;"/>
+            <div class="validation"></div>
+          </div>
+  
+          <div class="row"></div>
+  
+          <div class="field form-group">
+              <label id="typeLabel" for="sel1" style="color:white;">Select search type:</label>
+              <select class="form-control" id="typeField" style="width:400px;">
+                <option>artist</option>
+                <option>album</option>
+                <option>track</option>
+              </select>
+          </div>
+  
+          <div class="row"></div>
+          <input id="searchButton" type="submit" onclick="submit()" value="Search" class="btn btn-theme center">
+  
+          <div class="row"></div>
+          <div class="row"></div>
+          <iframe id="spotifyFrame" src="https://open.spotify.com/embed?uri=spotify:artist:5WUlDfRSoLAfcVSX1WnrxN" + artistIdResult width="400" height="380" frameborder="0" allowtransparency="true"></iframe>
+        </div>
+      </div>
+    </header>
+  </div>
+
+
+  <!-- Custom Scripts -->
+  <script>
+      
+      var apiKey = "BQBCGU4XPQDFJuix0_U8nC5LiDAcvfE157BxrLtiEzWUjiA5V80UgvjVes0g9X2bog_s-1j_aGKoHu-p1mlGafjzLHX9HBclkSv3U0dD_-0AsAHLe1A585uxbFK6DDkho4YUFdSLrw5XhbGT";
+
+        function submit(){
+          var typedString = $("#artistField").val();
+          var searchType = $("#typeField").val();
+          updateAPIKey();
+          pullSearchInfo(typedString, searchType);
+        }
+
+        function getURLParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1);
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        function updateAPIKey()
+        {
+          var data = getURLParams();
+          alert(data.access_token);
+          apiKey = data.access_token;
+          // document.getElementById("api-key").innerHTML  = data.access_token;
+        }
+        
+        function pullSearchInfo(str, sType)
+        {
+          var orig_artist = str;
+          orig_artist = orig_artist.split(" ");
+          var artistName = '';
+          for(var i = 0; i < orig_artist.length; i++)
+          {
+            artistName += orig_artist[i];
+            if(i != orig_artist.length-1)
+            {
+              artistName += "+";
+            }
+          }
+  
+          var myurl="https://api.spotify.com";
+          myurl += '/v1/search?q=';
+          myurl += artistName;
+          myurl += '&type=';
+          myurl += sType
+      
+          $.ajax({
+            url: myurl,
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader("Authorization", "Bearer " + apiKey)
+            }, success: function(data){
+              console.log(data);
+              var artistId = data[sType + 's']['items']['0']['id'];
+              var iframeSrc = "https://open.spotify.com/embed?uri=spotify:" + sType + ":" + artistId;
+              var iframe = $('#spotifyFrame');
+              $(iframe).attr('src',iframeSrc)
+            }
+          })
+        }
+    </script>
+
+    <!-- Spotify Scripts -->
+    <script id="user-profile-template" type="text/x-handlebars-template">
+      <h1>Logged in as {{display_name}}</h1>
+      <div class="media">
+        <div class="pull-left">
+          <img class="media-object" width="150" src="{{images.0.url}}" />
+        </div>
+        <div class="media-body">
+          <dl class="dl-horizontal">
+            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
+            <dt>Id</dt><dd>{{id}}</dd>
+            <dt>Email</dt><dd>{{email}}</dd>
+            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
+            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
+            <dt>Country</dt><dd>{{country}}</dd>
+          </dl>
+        </div>
+      </div>
+    </script>
+
+    <script id="oauth-template" type="text/x-handlebars-template">
+      <h2>oAuth info</h2>
+      <dl class="dl-horizontal">
+        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
+        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}></dd>
+      </dl>
+    </script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+    <script>
+      (function() {
+
+        /**
+         * Obtains parameters from the hash of the URL
+         * @return Object
+         */
+        function getHashParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1);
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
+            userProfileTemplate = Handlebars.compile(userProfileSource),
+            userProfilePlaceholder = document.getElementById('user-profile');
+
+        var oauthSource = document.getElementById('oauth-template').innerHTML,
+            oauthTemplate = Handlebars.compile(oauthSource),
+            oauthPlaceholder = document.getElementById('oauth');
+
+        var params = getHashParams();
+
+        var access_token = params.access_token,
+            refresh_token = params.refresh_token,
+            error = params.error;
+
+        if (error) {
+          alert('There was an error during the authentication');
+        } else {
+          if (access_token) {
+            // render oauth info
+            oauthPlaceholder.innerHTML = oauthTemplate({
+              access_token: access_token,
+              refresh_token: refresh_token
+            });
+
+            alert(access_token);
+
+            $.ajax({
+                url: 'https://api.spotify.com/v1/me',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+
+                  $('#login').hide();
+                  $('#loggedin').show();
+
+                  $('#typeField').show();
+              $('#artistField').show();
+              $('#how-to').show();
+              $('#searchButton').show();
+              $('#typeLabel').show();
+              $('#spotifyFrame').show();
+                }
+            });
+          } else {
+              // render initial screen
+              $('#login').show();
+              $('#loggedin').hide();
+
+              // $('#typeField').hide();
+              // $('#artistField').hide();
+              // $('#how-to').hide();
+              // $('#searchButton').hide();
+              // $('#typeLabel').hide();
+              // $('#spotifyFrame').hide();
+          }
+          document.getElementById('obtain-new-token').addEventListener('click', function() {
+            $.ajax({
+              url: '/refresh_token',
+              data: {
+                'refresh_token': refresh_token
+              }
+            }).done(function(data) {
+              access_token = data.access_token;
+              apiKey = data.access_token;
+		
+              oauthPlaceholder.innerHTML = oauthTemplate({
+                access_token: access_token,
+                refresh_token: refresh_token
+              });
+            });
+          }, false);
+        }
+      })();
+    </script>
+  </body>
+</html>
+
