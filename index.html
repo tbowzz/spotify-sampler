@@ -79,8 +79,6 @@
             Enter any artist, album, or track name below. Then specify the search type and click submit. You will then be able to sample music from 
             Spotify matching the search results.
           </h3>
-	        <button id="obtain-new-token" type="submit">Click</button>
-	        <p id="api-key"></p>          
           <div class="row"></div>
   
           <div class="field artist-name form-group">
@@ -136,7 +134,7 @@
         function updateAPIKey()
         {
           var data = getURLParams();
-          alert(data.access_token);
+          console.log(typeof(data.access_token));
           apiKey = data.access_token;
           // document.getElementById("api-key").innerHTML  = data.access_token;
         }
