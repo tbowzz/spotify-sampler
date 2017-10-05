@@ -109,6 +109,54 @@
     </header>
   </div>
 
+
+  <!-- Custom Scripts -->
+  <script>
+      
+        function submit(){
+          var typedString = $("#artistField").val();
+          var searchType = $("#typeField").val();
+          pullSearchInfo(typedString, searchType);
+        }
+        
+        function pullSearchInfo(str, sType)
+        {
+          var orig_artist = str;
+          orig_artist = orig_artist.split(" ");
+          var artistName = '';
+          for(var i = 0; i < orig_artist.length; i++)
+          {
+            artistName += orig_artist[i];
+            if(i != orig_artist.length-1)
+            {
+              artistName += "+";
+            }
+          }
+      
+          var myurl="https://api.spotify.com";
+          myurl += '/v1/search?q=';
+          myurl += artistName;
+          myurl += '&type=';
+          myurl += sType
+      
+          var apiKey = "BQBCGU4XPQDFJuix0_U8nC5LiDAcvfE157BxrLtiEzWUjiA5V80UgvjVes0g9X2bog_s-1j_aGKoHu-p1mlGafjzLHX9HBclkSv3U0dD_-0AsAHLe1A585uxbFK6DDkho4YUFdSLrw5XhbGT";
+      
+          $.ajax({
+            url: myurl,
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader("Authorization", "Bearer " + apiKey)
+            }, success: function(data){
+              console.log(data);
+              var artistId = data[sType + 's']['items']['0']['id'];
+              var iframeSrc = "https://open.spotify.com/embed?uri=spotify:" + sType + ":" + artistId;
+              var iframe = $('#spotifyFrame');
+              $(iframe).attr('src',iframeSrc)
+            }
+          })
+        }
+    </script>
+
+    <!-- Spotify Scripts -->
     <script id="user-profile-template" type="text/x-handlebars-template">
       <h1>Logged in as {{display_name}}</h1>
       <div class="media">
@@ -193,6 +241,13 @@
 
                   $('#login').hide();
                   $('#loggedin').show();
+
+                  $('#typeField').show();
+              $('#artistField').show();
+              $('#how-to').show();
+              $('#searchButton').show();
+              $('#typeLabel').show();
+              $('#spotifyFrame').show();
                 }
             });
           } else {
@@ -216,6 +271,7 @@
               }
             }).done(function(data) {
               access_token = data.access_token;
+              apiKey = data.access_token;
               oauthPlaceholder.innerHTML = oauthTemplate({
                 access_token: access_token,
                 refresh_token: refresh_token
