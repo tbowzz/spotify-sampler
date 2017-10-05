@@ -127,10 +127,10 @@
 
         function updateAPIKey()
         {
-          var data = getURLParameter('data');
+          var data = getURLParameter('code');
           // console.log(data);
           // alert(data);
-          updateOAuth(data.access_token);
+          updateOAuth(data);
           // apiKey = data.access_token;
           // document.getElementById("api-key").innerHTML  = data.access_token;
         }
