@@ -14,7 +14,7 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '32f6e2b53173461d9ab6cfdc5bd34786'; // Your client id
 var client_secret = '1d6ef338a60341ec9afed06d0ccb866d'; // Your secret
-var redirect_uri = 'http://tbowdev.com/prod/spotify-sampler'; // Your redirect uri
+var redirect_uri = 'http://tbowdev.com/prod/spotify-sampler/authorization_code/public'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -135,7 +135,8 @@ app.get('/refresh_token', function(req, res) {
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
       res.send({
-        'access_token': access_token
+        'access_token': access_token,
+	'apiKey': access_token
       });
     }
   });
