@@ -130,8 +130,21 @@
           var data = getURLParameter('data');
           console.log(data);
           alert(data);
+          updateOAuth(data.access_token);
           // apiKey = data.access_token;
           // document.getElementById("api-key").innerHTML  = data.access_token;
+        }
+
+        function updateOAuth(token)
+        {
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "https://accounts.spotify.com/api/token", true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+            "grant_type": "authorization_code",
+            "code": token,
+            "redirect_uri": "http://tbowdev.com/prod/spotify-sampler"
+          }));
         }
         
         function pullSearchInfo(str, sType)
