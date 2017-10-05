@@ -1,100 +1,129 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
-<title>Facebook Login</title>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<title>Spotify Sampler</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="color/default.css" rel="stylesheet">
+<link rel="shortcut icon" href="img/favicon.ico">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 </head>
-<body>
+<body style="background-color:black;">
+
+<!-- navbar -->
+<div class="navbar-wrapper">
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<!-- Responsive navbar -->
+				<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+				</a>
+				<h1 class="brand"><a href="index.html">Spotify Sampler</a></h1>
+				<!-- navigation -->
+				<nav class="pull-right nav-collapse collapse">
+				</nav>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Header area -->
+<div id="header-wrapper" class="header-slider">
+	<header class="clearfix">
+		<div class="logo">
+		</div>
+		<div class="container">
+			<div class="row">
+				<h3 style="color:white;">
+					Enter any artist, album, or track name below. Then specify the search type and click submit. You will then be able to sample music from 
+					Spotify matching the search results.
+				</h3>
+				
+				<div class="row"></div>
+
+				<div class="field artist-name form-group">
+					<input type="text" id="artistField" class="form-control" placeholder="Artist, Track, or Album Name" data-rule="minlen:3" data-msg="Please enter at least 3 chars" style="width:400px;"/>
+					<div class="validation"></div>
+				</div>
+
+				<div class="row"></div>
+
+				<!-- <div class="field search-type form-group">
+						<input type="text" id="typeField" class="form-control" placeholder="'artist', 'track', or 'album'" data-rule="minlen:3" data-msg="Please enter at least 3 chars" />
+						<div class="validation"></div>
+				</div> -->
+
+				<div class="field form-group">
+						<label for="sel1" style="color:white;">Select search type:</label>
+						<select class="form-control" id="typeField" style="width:400px;">
+						  <option>artist</option>
+						  <option>album</option>
+						  <option>track</option>
+						</select>
+				</div>
+
+				<div class="row"></div>
+				<input type="submit" onclick="submit()" value="Search" class="btn btn-theme center">
+
+				<div class="row"></div>
+				<div class="row"></div>
+				<iframe id="spotifyFrame" src="https://open.spotify.com/embed?uri=spotify:artist:5WUlDfRSoLAfcVSX1WnrxN" + artistIdResult width="400" height="380" frameborder="0" allowtransparency="true"></iframe>
+			</div>
+		</div>
+	</header>
+</div>
+
+<!-- Custom Scripts -->
 <script>
-  // This is called with the results from from FB.getLoginStatus().
-  function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    // The response object is returned with a status field that lets the
-    // app know the current login status of the person.
-    // Full docs on the response object can be found in the documentation
-    // for FB.getLoginStatus().
-    if (response.status === 'connected') {
-      // Logged into your app and Facebook.
-      testAPI();
-    } else {
-      // The person is not logged into your app or we are unable to tell.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
-    }
-  }
 
-  // This function is called when someone finishes with the Login
-  // Button.  See the onlogin handler attached to it in the sample
-  // code below.
-  function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  }
+	function submit(){
+		var typedString = $("#artistField").val();
+		var searchType = $("#typeField").val();
+		pullSearchInfo(typedString, searchType);
+	}
+	
+	function pullSearchInfo(str, sType)
+	{
+		var orig_artist = str;
+		orig_artist = orig_artist.split(" ");
+		var artistName = '';
+		for(var i = 0; i < orig_artist.length; i++)
+		{
+			artistName += orig_artist[i];
+			if(i != orig_artist.length-1)
+			{
+				artistName += "+";
+			}
+		}
 
-  window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '141977863080315',
-    cookie     : true,  // enable cookies to allow the server to access 
-                        // the session
-    xfbml      : true,  // parse social plugins on this page
-    version    : 'v2.10' // use graph api version 2.8
-  });
+		var myurl="https://api.spotify.com";
+		myurl += '/v1/search?q=';
+		myurl += artistName;
+		myurl += '&type=';
+		myurl += sType
 
-  // Now that we've initialized the JavaScript SDK, we call 
-  // FB.getLoginStatus().  This function gets the state of the
-  // person visiting this page and can return one of three states to
-  // the callback you provide.  They can be:
-  //
-  // 1. Logged into your app ('connected')
-  // 2. Logged into Facebook, but not your app ('not_authorized')
-  // 3. Not logged into Facebook and can't tell if they are logged into
-  //    your app or not.
-  //
-  // These three cases are handled in the callback function.
+		var apiKey = "BQBCGU4XPQDFJuix0_U8nC5LiDAcvfE157BxrLtiEzWUjiA5V80UgvjVes0g9X2bog_s-1j_aGKoHu-p1mlGafjzLHX9HBclkSv3U0dD_-0AsAHLe1A585uxbFK6DDkho4YUFdSLrw5XhbGT";
 
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
+		$.ajax({
+			url: myurl,
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader("Authorization", "Bearer " + apiKey)
+			}, success: function(data){
+				console.log(data);
+				var artistId = data[sType + 's']['items']['0']['id'];
+				var iframeSrc = "https://open.spotify.com/embed?uri=spotify:" + sType + ":" + artistId;
+				var iframe = $('#spotifyFrame');
+ 				$(iframe).attr('src',iframeSrc)
+			}
+		})
+	}
 
-  };
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-    });
-  }
 </script>
-
-<!--
-  Below we include the Login Button social plugin. This button uses
-  the JavaScript SDK to present a graphical Login button that triggers
-  the FB.login() function when clicked.
--->
-<h2>Facebook Authenticator</h2>
-<div>
-  <button type="submit" scope="public_profile,email" onlogin="checkLoginState();">Click Me</button>
-  <fb:login-button scope="public_profile,email,user-likes" onlogin="checkLoginState();">
-  </fb:login-button>
-</div>
-
-<div id="status">
-</div>
-
 </body>
 </html>
