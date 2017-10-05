@@ -121,20 +121,14 @@
           pullSearchInfo(typedString, searchType);
         }
 
-        function getURLParams() {
-          var hashParams = {};
-          var e, r = /([^&;=]+)=?([^&;]*)/g,
-              q = window.location.hash.substring(1);
-          while ( e = r.exec(q)) {
-             hashParams[e[1]] = decodeURIComponent(e[2]);
-          }
-          return hashParams;
+        function getURLParameter(name) {
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
         }
 
         function updateAPIKey()
         {
-          var data = getURLParams();
-          console.log(typeof(data.access_token));
+          var data = getURLParameter('data');
+          console.log(data);
           apiKey = data.access_token;
           // document.getElementById("api-key").innerHTML  = data.access_token;
         }
